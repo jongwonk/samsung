@@ -139,7 +139,7 @@ struct platform_device s5p_device_mfc = {
 
 
 struct platform_device samsung_asoc_idma = {
-	.name		= "samsung-idma",
+	.name		= "samsung-audio", // for internal DMA(IDMA)
 	.id		= -1,
 	.dev		= {
 		.dma_mask		= &samsung_device_dma_mask,
