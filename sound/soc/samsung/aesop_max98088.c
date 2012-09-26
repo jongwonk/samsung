@@ -219,39 +219,13 @@ static int aesop_voice_hw_params(struct snd_pcm_substream *substream,
 	
 	return 0;
 }
-/*
-static struct snd_soc_ops aesop_voice_ops = {
-	.hw_params = aesop_voice_hw_params,
-};
-*/
-
-/*
-
-{
-	.name = "MAX98088 Voice",
-	.stream_name = "Voice",
-	.cpu_dai_name = "samsung-i2s.4",
-	.codec_dai_name = "max98088_Aux",
-	.platform_name = "samsung-audio",
-	.codec_name = "max98088-codec.0-0010",
-	.ops = &aesop_voice_ops,
-},
-*/
-
-/*
-struct snd_soc_card aesop = {
-	.name = "aesop",
-	.dai_link = aesop_dai_link,
-	.num_links = ARRAY_SIZE(aesop_dai_link),
-};
-*/
 
 struct snd_soc_dai_link aesop_dai_link[] = {
 {
 	.name = "MAX98088",
 	.stream_name = "HiFi Playback",
 	.cpu_dai_name = "samsung-i2s.0",
-	.codec_dai_name = "max98088_HiFi",
+	.codec_dai_name = "HiFi",
 	.platform_name = "samsung-audio", //"samsung-pcm", //
 	.codec_name = "max98088.0-0010",
 	.init = aesop_max98088_init,
