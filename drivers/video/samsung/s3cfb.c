@@ -750,7 +750,7 @@ static void s3cfb_init_fbinfo(struct s3cfb_global *ctrl, int id)
 	var->xres_virtual = var->xres * CONFIG_FB_S3C_NR_BUFFERS;
 	var->yres_virtual = var->yres;
 #endif
-	var->bits_per_pixel = 24;
+	var->bits_per_pixel = 32;
 	
 	var->xoffset = 0;
 	var->yoffset = 0;
