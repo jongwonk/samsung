@@ -248,25 +248,18 @@ static int __init aesop_init(void)
 	
 	if (!aesop_snd_device)
 	{
-		printk("\nerror - 1\n\n");
 		return -ENOMEM;
 	}
-	
-	printk("\npass - 1\n\n");
 	
 	platform_set_drvdata(aesop_snd_device, &aesop);
 	ret = platform_device_add(aesop_snd_device);
 
-	
 	if (ret) {
-		printk("\npass - 2\n\n");
 		platform_device_put(aesop_snd_device);
 	}
 
-	printk("\npass - 3\n\n");
 	clk_init();
 	
-	printk("\npass - 4\n\n");
 	return ret;
 }
 
