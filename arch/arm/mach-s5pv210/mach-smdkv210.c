@@ -66,7 +66,7 @@
 
 extern struct platform_device s5pv210_pd_g3d;
 extern struct platform_device s5pv210_pd_lcd;
-
+extern struct platform_device s5pv210_pd_audio;
 
 #define S5P_PA_SMC9115 0xA0000000 
 
@@ -326,6 +326,11 @@ static void smdkv210_cfg_gpio(struct platform_device *dev)
 
 }
 
+static void smdkv210_cfg_gpio_spi1(void)
+{
+	s5pv210_fb_cfg_gpios(S5PV210_GPB(4), 4);
+}
+
 #define S5PV210_GPD_0_0_TOUT_0  (0x2)
 #define S5PV210_GPD_0_1_TOUT_1  (0x2 << 4)
 #define S5PV210_GPD_0_2_TOUT_2  (0x2 << 8)
@@ -442,47 +447,6 @@ static struct platform_device smdkv210_backlight_device = {
 	},
 };
 
-
-#if 0 
-static struct s3c64xx_spi_csinfo smdk_spi1_csi[] = {
-	[SMDK_MMCSPI_CS] = {
-		.line = S5PV210_GPB(5),
-		.set_level = gpio_set_value,
-		.fb_delay = 0x2,
-	},
-};
-
-static struct spi_board_info s3c_spi_devs[] __initdata = {
-	{
-		.modalias        = "spidev", /* MMC SPI */
-		.mode            = SPI_MODE_0,  /* CPOL=0, CPHA=0 */
-		.max_speed_hz    = 10000000,
-		/* Connected to SPI-0 as 1st Slave */
-		.bus_num         = 0,
-		.chip_select     = 0,
-		.controller_data = &smdk_spi0_csi[SMDK_MMCSPI_CS],
-	},
-	{
-		.modalias        = "spidev", /* MMC SPI */
-		.mode            = SPI_MODE_0,  /* CPOL=0, CPHA=0 */
-		.max_speed_hz    = 10000000,
-		/* Connected to SPI-0 as 1st Slave */
-		.bus_num         = 1,
-		.chip_select     = 0,
-		.controller_data = &smdk_spi1_csi[SMDK_MMCSPI_CS],
-	},
-};
-#endif
-
-
-#define LCD_BUS_NUM     1
-
-#define DISPLAY_CS      S5PV210_GPB(5)
-#define DISPLAY_CLK     S5PV210_GPB(4)
-#define DISPLAY_SO      S5PV210_GPB(6)
-#define DISPLAY_SI      S5PV210_GPB(7)
-
-
 static struct s3c64xx_spi_csinfo smdk_spi1_csi = {
 	      .line = S5PV210_GPB(5),
 	      .set_level = gpio_set_value,
@@ -492,30 +456,12 @@ static struct s3c64xx_spi_csinfo smdk_spi1_csi = {
 static struct spi_board_info s3c_spi_devs[] __initdata = {
 	{
 		.modalias        = "ams369fg06",
-		.mode            = SPI_MODE_3,  /* CPOL=0, CPHA=0 */
-		.max_speed_hz    = 1000000,
+		.mode            = SPI_MODE_0,
+		.max_speed_hz    = 500000,
 		.bus_num         = 1,
 		.chip_select     = 0,
-		.controller_data = (void *)DISPLAY_CS,//&smdk_spi1_csi,
+		.controller_data = &smdk_spi1_csi,		
 	},
-};
-
-
-static struct spi_gpio_platform_data tl2796_spi_gpio_data = {
-        .sck    = DISPLAY_CLK,
-        .mosi   = DISPLAY_SI,
-        //.miso   = DISPLAY_SO,
-        .miso   = -1,
-        .num_chipselect = 2, // ghcstop fix
-};
-
-static struct platform_device s3c_device_spi_gpio = {
-        .name   = "spi_gpio",
-        .id     = LCD_BUS_NUM,
-        .dev    = {
-                .parent         = &s3c_device_fb.dev,
-                .platform_data  = &tl2796_spi_gpio_data,
-        },
 };
 
 struct platform_device sec_device_battery = {
@@ -551,7 +497,7 @@ static struct platform_device *smdkv210_devices[] __initdata = {
 
 	&s5pv210_pd_g3d,
 	&s5pv210_pd_lcd,
-	
+	&s5pv210_pd_audio,
 	&s3c_device_g3d,
 	&s3c_device_lcd,
 	
@@ -559,11 +505,11 @@ static struct platform_device *smdkv210_devices[] __initdata = {
 	&s5pv210_device_iis0,
 	&s5pv210_device_spdif,
 	&samsung_asoc_dma,
-	&samsung_asoc_idma,
 	
 	&s3c_device_fb,
-	&s3c_device_spi_gpio,	
-//	&s5pv210_device_spi1,
+
+	&s5pv210_device_spi1,
+
 //	&samsung_device_keypad,
 	&s3c_device_timer[3],
 #if 0	
@@ -681,6 +627,8 @@ static void __init smdkv210_machine_init(void)
 	
 	spi_register_board_info(s3c_spi_devs, ARRAY_SIZE(s3c_spi_devs));
 	
+	s5pv210_spi_set_info(1,0,0);
+	
 	s3cfb_set_platdata(&aesop_lcd_data);
 
 	smdkc110_smc911x_set();
@@ -688,6 +636,8 @@ static void __init smdkv210_machine_init(void)
 	platform_add_devices(smdkv210_devices, ARRAY_SIZE(smdkv210_devices));
 	
 	aesop_navi_init();
+	
+	//smdkv210_cfg_gpio_spi1();
 }
 
 MACHINE_START(SMDKV210, "SMDKV210")
